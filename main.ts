@@ -1,13 +1,22 @@
+controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+    attemptJump1()
+})
 function attemptJump2 () {
     if (Player2.isHittingTile(CollisionDirection.Bottom)) {
         Player2.vy = -5 * pixelsToMeters
     }
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    attemptJump1()
+    projectile = sprites.createProjectileFromSprite(assets.image`punchRight`, Player1, 5, 0)
+    animation.runImageAnimation(
+    projectile,
+    assets.animation`PunchRightAnimation`,
+    100,
+    false
+    )
 })
 controller.player2.onButtonEvent(ControllerButton.A, ControllerButtonEvent.Pressed, function () {
-    attemptJump2()
+	
 })
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     animation.runImageAnimation(
@@ -18,13 +27,13 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     )
 })
 controller.player2.onButtonEvent(ControllerButton.Left, ControllerButtonEvent.Released, function () {
-    animation.stopAnimation(animation.AnimationTypes.MovementAnimation, Player2)
+	
 })
 controller.right.onEvent(ControllerButtonEvent.Released, function () {
     animation.stopAnimation(animation.AnimationTypes.ImageAnimation, Player1)
 })
 function initializeLevel1 () {
-    tiles.setTilemap(tilemap`Test Tilemap1`)
+    tiles.setTilemap(tilemap`Level1`)
     scene.setBackgroundImage(img`
         7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
         7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
@@ -148,7 +157,7 @@ function initializeLevel1 () {
         7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
         `)
     createPlayer1()
-    createPlayer2()
+    tiles.placeOnRandomTile(Player1, sprites.builtin.forestTiles0)
 }
 controller.left.onEvent(ControllerButtonEvent.Released, function () {
     animation.stopAnimation(animation.AnimationTypes.ImageAnimation, Player1)
@@ -162,44 +171,33 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     )
 })
 controller.player2.onButtonEvent(ControllerButton.Right, ControllerButtonEvent.Pressed, function () {
-    animation.runImageAnimation(
-    Player2,
-    assets.animation`Player2AnimateRight`,
-    200,
-    true
-    )
+	
 })
 controller.player2.onButtonEvent(ControllerButton.Left, ControllerButtonEvent.Pressed, function () {
-    animation.runImageAnimation(
-    Player2,
-    assets.animation`Player2AnimateLeft`,
-    200,
-    true
-    )
+	
 })
 function attemptJump1 () {
     if (Player1.isHittingTile(CollisionDirection.Bottom)) {
-        Player1.vy = -5 * pixelsToMeters
+        Player1.vy = -8 * pixelsToMeters
     }
 }
 function createPlayer1 () {
     Player1 = sprites.create(assets.image`Player1Stationary`, SpriteKind.Player)
-    controller.moveSprite(Player1, 80, 0)
     Player1.ay = 500
-    tiles.placeOnRandomTile(Player1, sprites.builtin.forestTiles22)
+    controller.moveSprite(Player1, 80, 0)
     scene.cameraFollowSprite(Player1)
 }
 function createPlayer2 () {
     Player2 = sprites.create(assets.image`Player2Stationary`, SpriteKind.Player)
-    tiles.placeOnRandomTile(Player2, sprites.builtin.forestTiles22)
+    tiles.placeOnRandomTile(Player2, sprites.builtin.forestTiles0)
     Player2.ay = 500
     controller.moveSprite(Player2, 80, 0)
-    scene.cameraFollowSprite(Player2)
 }
 controller.player2.onButtonEvent(ControllerButton.Right, ControllerButtonEvent.Released, function () {
-    animation.stopAnimation(animation.AnimationTypes.MovementAnimation, Player2)
+	
 })
 let Player1: Sprite = null
+let projectile: Sprite = null
 let Player2: Sprite = null
 let pixelsToMeters = 0
 pixelsToMeters = 30
