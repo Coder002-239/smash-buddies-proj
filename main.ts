@@ -4,8 +4,8 @@ namespace SpriteKind {
 }
 function launchProjectile1 () {
     timer.throttle("action", 500, function () {
-        projectile = sprites.createProjectileFromSprite(assets.image`punchRight1`, Player1, 20, 0)
         if (controller.left.isPressed()) {
+            projectile = sprites.createProjectileFromSprite(assets.image`punchRight1`, Player1, -20, 0)
             animation.runImageAnimation(
             projectile,
             assets.animation`PunchLeftAnimation`,
@@ -13,6 +13,7 @@ function launchProjectile1 () {
             false
             )
         } else {
+            projectile = sprites.createProjectileFromSprite(assets.image`punchRight1`, Player1, 20, 0)
             animation.runImageAnimation(
             projectile,
             assets.animation`PunchRightAnimation`,
@@ -26,24 +27,40 @@ function launchProjectile1 () {
     })
 }
 sprites.onOverlap(SpriteKind.Projectile2, SpriteKind.Player, function (sprite, otherSprite) {
-    if (info.player1.hasLife()) {
-        info.changeLifeBy(-1)
-        info.changeScoreBy(168)
-    } else {
-        Player1.destroy()
-        info.changeScoreBy(532)
-        music.powerDown.play()
-    }
-    scene.cameraShake(4, 500)
+    timer.throttle("action", 500, function () {
+        if (true) {
+            info.changeLifeBy(-1)
+            info.changeScoreBy(168)
+        } else {
+            Player1.destroy()
+            info.changeScoreBy(532)
+            music.powerDown.play()
+        }
+        scene.cameraShake(4, 500)
+    })
 })
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     attemptJump1()
 })
+scene.onHitWall(SpriteKind.Player2, function (sprite, location) {
+    if (Player2.isHittingTile(CollisionDirection.Left)) {
+        attemptJump2()
+    }
+    if (Player2.isHittingTile(CollisionDirection.Right)) {
+        attemptJump2()
+    }
+})
 function attemptJump2 () {
     if (Player2.isHittingTile(CollisionDirection.Bottom)) {
-        Player2.vy = -5 * pixelsToMeters
+        Player2.vy = -10 * pixelsToMeters
     }
 }
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Player2, function (sprite, otherSprite) {
+    scene.cameraShake(4, 500)
+    music.powerUp.play()
+    Player2.destroy()
+    game.over(true, effects.confetti)
+})
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     launchProjectile1()
 })
@@ -59,6 +76,9 @@ controller.right.onEvent(ControllerButtonEvent.Released, function () {
     animation.stopAnimation(animation.AnimationTypes.ImageAnimation, Player1)
 })
 function initializeLevel1 () {
+    game.showLongText("Welcome to Smash Buddies! Play: A", DialogLayout.Full)
+    game.showLongText("Punch the blue enemy by pressing a! But watch out for their punches, too. If you defeat him in all 3 maps, you win!", DialogLayout.Center)
+    game.showLongText("Good luck, and have fun!", DialogLayout.Center)
     tiles.setTilemap(tilemap`Level1`)
     scene.setBackgroundImage(img`
         7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
@@ -183,7 +203,9 @@ function initializeLevel1 () {
         7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
         `)
     projectile = sprites.create(assets.image`punchRight1`, SpriteKind.Projectile)
+    projectile.destroy()
     projectile_2 = sprites.create(assets.image`punchRight2`, SpriteKind.Projectile2)
+    projectile_2.destroy()
     createPlayer1()
     createPlayer2()
     tiles.placeOnRandomTile(Player1, sprites.builtin.forestTiles0)
@@ -237,27 +259,14 @@ function createPlayer1 () {
     info.setScore(0)
 }
 function createPlayer2 () {
-    Player2 = sprites.create(assets.image`Player2Stationary`, SpriteKind.Enemy)
+    Player2 = sprites.create(assets.image`Player2Stationary`, SpriteKind.Player2)
     tiles.placeOnRandomTile(Player2, sprites.builtin.forestTiles0)
+    controller.player2.moveSprite(Player2)
     Player2.ay = 500
-    Player2.follow(Player1, 100)
+    Player2.follow(Player1, 50)
     info.player2.setLife(10)
     info.player2.setScore(0)
-    launchProjectile2()
 }
-sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
-    timer.throttle("action", 500, function () {
-        if (info.player2.hasLife()) {
-            info.player2.changeLifeBy(-1)
-            info.player2.changeScoreBy(168)
-        } else {
-            Player2.destroy()
-            info.player2.changeScoreBy(532)
-        }
-        scene.cameraShake(8, 500)
-        music.powerUp.play()
-    })
-})
 let projectile_2: Sprite = null
 let Player2: Sprite = null
 let Player1: Sprite = null
@@ -265,3 +274,6 @@ let projectile: Sprite = null
 let pixelsToMeters = 0
 pixelsToMeters = 30
 initializeLevel1()
+forever(function () {
+    launchProjectile2()
+})
