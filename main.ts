@@ -1,3 +1,21 @@
+function launchProjectile1 () {
+    projectile = sprites.createProjectileFromSprite(assets.image`punchRight`, Player1, 20, 0)
+    if (controller.left.isPressed()) {
+        animation.runImageAnimation(
+        projectile,
+        assets.animation`PunchLeftAnimation`,
+        50,
+        false
+        )
+    } else {
+        animation.runImageAnimation(
+        projectile,
+        assets.animation`PunchRightAnimation`,
+        50,
+        false
+        )
+    }
+}
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     attemptJump1()
 })
@@ -7,13 +25,7 @@ function attemptJump2 () {
     }
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    projectile = sprites.createProjectileFromSprite(assets.image`punchRight`, Player1, 5, 0)
-    animation.runImageAnimation(
-    projectile,
-    assets.animation`PunchRightAnimation`,
-    100,
-    false
-    )
+    launchProjectile1()
 })
 controller.player2.onButtonEvent(ControllerButton.A, ControllerButtonEvent.Pressed, function () {
 	
@@ -196,9 +208,9 @@ function createPlayer2 () {
 controller.player2.onButtonEvent(ControllerButton.Right, ControllerButtonEvent.Released, function () {
 	
 })
+let Player2: Sprite = null
 let Player1: Sprite = null
 let projectile: Sprite = null
-let Player2: Sprite = null
 let pixelsToMeters = 0
 pixelsToMeters = 30
 initializeLevel1()
