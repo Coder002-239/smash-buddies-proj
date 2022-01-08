@@ -27,17 +27,7 @@ function launchProjectile1 () {
     })
 }
 sprites.onOverlap(SpriteKind.Projectile2, SpriteKind.Player, function (sprite, otherSprite) {
-    timer.throttle("action", 500, function () {
-        if (true) {
-            info.changeLifeBy(-1)
-            info.changeScoreBy(168)
-        } else {
-            Player1.destroy()
-            info.changeScoreBy(532)
-            music.powerDown.play()
-        }
-        scene.cameraShake(4, 500)
-    })
+	
 })
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     attemptJump1()
@@ -58,8 +48,7 @@ function attemptJump2 () {
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Player2, function (sprite, otherSprite) {
     scene.cameraShake(4, 500)
     music.powerUp.play()
-    Player2.destroy()
-    game.over(true, effects.confetti)
+    otherSprite.destroy()
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     launchProjectile1()
@@ -202,10 +191,6 @@ function initializeLevel1 () {
         7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
         7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
         `)
-    projectile = sprites.create(assets.image`punchRight1`, SpriteKind.Projectile)
-    projectile.destroy()
-    projectile_2 = sprites.create(assets.image`punchRight2`, SpriteKind.Projectile2)
-    projectile_2.destroy()
     createPlayer1()
     createPlayer2()
     tiles.placeOnRandomTile(Player1, sprites.builtin.forestTiles0)
@@ -245,6 +230,9 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     true
     )
 })
+sprites.onDestroyed(SpriteKind.Player2, function (sprite) {
+    game.over(true, effects.confetti)
+})
 function attemptJump1 () {
     if (Player1.isHittingTile(CollisionDirection.Bottom)) {
         Player1.vy = -8 * pixelsToMeters
@@ -261,7 +249,6 @@ function createPlayer1 () {
 function createPlayer2 () {
     Player2 = sprites.create(assets.image`Player2Stationary`, SpriteKind.Player2)
     tiles.placeOnRandomTile(Player2, sprites.builtin.forestTiles0)
-    controller.player2.moveSprite(Player2)
     Player2.ay = 500
     Player2.follow(Player1, 50)
     info.player2.setLife(10)
@@ -275,5 +262,5 @@ let pixelsToMeters = 0
 pixelsToMeters = 30
 initializeLevel1()
 forever(function () {
-    launchProjectile2()
+	
 })
