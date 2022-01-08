@@ -15,6 +15,9 @@ function launchProjectile1 () {
         false
         )
     }
+    timer.after(500, function () {
+        projectile.destroy(effects.spray, 500)
+    })
 }
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     attemptJump1()
