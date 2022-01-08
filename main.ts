@@ -1,24 +1,41 @@
+namespace SpriteKind {
+    export const Player2 = SpriteKind.create()
+    export const Projectile2 = SpriteKind.create()
+}
 function launchProjectile1 () {
-    projectile = sprites.createProjectileFromSprite(assets.image`punchRight`, Player1, 20, 0)
-    if (controller.left.isPressed()) {
-        animation.runImageAnimation(
-        projectile,
-        assets.animation`PunchLeftAnimation`,
-        50,
-        false
-        )
-    } else {
-        animation.runImageAnimation(
-        projectile,
-        assets.animation`PunchRightAnimation`,
-        50,
-        false
-        )
-    }
-    timer.after(500, function () {
-        projectile.destroy(effects.spray, 500)
+    timer.throttle("action", 500, function () {
+        projectile = sprites.createProjectileFromSprite(assets.image`punchRight1`, Player1, 20, 0)
+        if (controller.left.isPressed()) {
+            animation.runImageAnimation(
+            projectile,
+            assets.animation`PunchLeftAnimation`,
+            50,
+            false
+            )
+        } else {
+            animation.runImageAnimation(
+            projectile,
+            assets.animation`PunchRightAnimation`,
+            50,
+            false
+            )
+        }
+        timer.after(300, function () {
+            projectile.destroy()
+        })
     })
 }
+sprites.onOverlap(SpriteKind.Projectile2, SpriteKind.Player, function (sprite, otherSprite) {
+    if (info.player1.hasLife()) {
+        info.changeLifeBy(-1)
+        info.changeScoreBy(168)
+    } else {
+        Player1.destroy()
+        info.changeScoreBy(532)
+        music.powerDown.play()
+    }
+    scene.cameraShake(4, 500)
+})
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     attemptJump1()
 })
@@ -30,9 +47,6 @@ function attemptJump2 () {
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     launchProjectile1()
 })
-controller.player2.onButtonEvent(ControllerButton.A, ControllerButtonEvent.Pressed, function () {
-	
-})
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     animation.runImageAnimation(
     Player1,
@@ -40,9 +54,6 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     200,
     true
     )
-})
-controller.player2.onButtonEvent(ControllerButton.Left, ControllerButtonEvent.Released, function () {
-	
 })
 controller.right.onEvent(ControllerButtonEvent.Released, function () {
     animation.stopAnimation(animation.AnimationTypes.ImageAnimation, Player1)
@@ -171,12 +182,39 @@ function initializeLevel1 () {
         7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
         7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
         `)
+    projectile = sprites.create(assets.image`punchRight1`, SpriteKind.Projectile)
+    projectile_2 = sprites.create(assets.image`punchRight2`, SpriteKind.Projectile2)
     createPlayer1()
+    createPlayer2()
     tiles.placeOnRandomTile(Player1, sprites.builtin.forestTiles0)
+    tiles.placeOnRandomTile(Player2, sprites.builtin.forestTiles0)
 }
 controller.left.onEvent(ControllerButtonEvent.Released, function () {
     animation.stopAnimation(animation.AnimationTypes.ImageAnimation, Player1)
 })
+function launchProjectile2 () {
+    timer.throttle("action", 500, function () {
+        projectile_2 = sprites.createProjectileFromSprite(assets.image`punchRight2`, Player2, 20, 0)
+        if (controller.left.isPressed()) {
+            animation.runImageAnimation(
+            projectile_2,
+            assets.animation`PunchLeftAnimation`,
+            50,
+            false
+            )
+        } else {
+            animation.runImageAnimation(
+            projectile_2,
+            assets.animation`PunchRightAnimation`,
+            50,
+            false
+            )
+        }
+        timer.after(300, function () {
+            projectile_2.destroy()
+        })
+    })
+}
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     animation.runImageAnimation(
     Player1,
@@ -184,12 +222,6 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     200,
     true
     )
-})
-controller.player2.onButtonEvent(ControllerButton.Right, ControllerButtonEvent.Pressed, function () {
-	
-})
-controller.player2.onButtonEvent(ControllerButton.Left, ControllerButtonEvent.Pressed, function () {
-	
 })
 function attemptJump1 () {
     if (Player1.isHittingTile(CollisionDirection.Bottom)) {
@@ -199,18 +231,34 @@ function attemptJump1 () {
 function createPlayer1 () {
     Player1 = sprites.create(assets.image`Player1Stationary`, SpriteKind.Player)
     Player1.ay = 500
-    controller.moveSprite(Player1, 80, 0)
+    controller.player1.moveSprite(Player1, 100, 0)
     scene.cameraFollowSprite(Player1)
+    info.setLife(10)
+    info.setScore(0)
 }
 function createPlayer2 () {
-    Player2 = sprites.create(assets.image`Player2Stationary`, SpriteKind.Player)
+    Player2 = sprites.create(assets.image`Player2Stationary`, SpriteKind.Enemy)
     tiles.placeOnRandomTile(Player2, sprites.builtin.forestTiles0)
     Player2.ay = 500
-    controller.moveSprite(Player2, 80, 0)
+    Player2.follow(Player1, 100)
+    info.player2.setLife(10)
+    info.player2.setScore(0)
+    launchProjectile2()
 }
-controller.player2.onButtonEvent(ControllerButton.Right, ControllerButtonEvent.Released, function () {
-	
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
+    timer.throttle("action", 500, function () {
+        if (info.player2.hasLife()) {
+            info.player2.changeLifeBy(-1)
+            info.player2.changeScoreBy(168)
+        } else {
+            Player2.destroy()
+            info.player2.changeScoreBy(532)
+        }
+        scene.cameraShake(8, 500)
+        music.powerUp.play()
+    })
 })
+let projectile_2: Sprite = null
 let Player2: Sprite = null
 let Player1: Sprite = null
 let projectile: Sprite = null
