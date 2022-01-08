@@ -26,9 +26,6 @@ function launchProjectile1 () {
         })
     })
 }
-sprites.onOverlap(SpriteKind.Projectile2, SpriteKind.Player, function (sprite, otherSprite) {
-	
-})
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     attemptJump1()
 })
@@ -68,6 +65,7 @@ function initializeLevel1 () {
     game.showLongText("Welcome to Smash Buddies! Play: A", DialogLayout.Full)
     game.showLongText("Punch the blue enemy by pressing a! But watch out for their punches, too. If you defeat him in all 3 maps, you win!", DialogLayout.Center)
     game.showLongText("Good luck, and have fun!", DialogLayout.Center)
+    music.beamUp.play()
     tiles.setTilemap(tilemap`Level1`)
     scene.setBackgroundImage(img`
         7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777
@@ -222,6 +220,13 @@ function launchProjectile2 () {
         })
     })
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Player2, function (sprite, otherSprite) {
+    timer.throttle("action", 500, function () {
+        info.changeLifeBy(-1)
+        scene.cameraShake(4, 500)
+        music.powerDown.play()
+    })
+})
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     animation.runImageAnimation(
     Player1,
@@ -243,7 +248,7 @@ function createPlayer1 () {
     Player1.ay = 500
     controller.player1.moveSprite(Player1, 100, 0)
     scene.cameraFollowSprite(Player1)
-    info.setLife(10)
+    info.setLife(5)
     info.setScore(0)
 }
 function createPlayer2 () {
@@ -251,8 +256,6 @@ function createPlayer2 () {
     tiles.placeOnRandomTile(Player2, sprites.builtin.forestTiles0)
     Player2.ay = 500
     Player2.follow(Player1, 50)
-    info.player2.setLife(10)
-    info.player2.setScore(0)
 }
 let projectile_2: Sprite = null
 let Player2: Sprite = null
@@ -261,6 +264,3 @@ let projectile: Sprite = null
 let pixelsToMeters = 0
 pixelsToMeters = 30
 initializeLevel1()
-forever(function () {
-	
-})
